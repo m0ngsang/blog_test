@@ -1,59 +1,53 @@
-const CATEGORIES = ["IGIS", "공간", "금융"] as const;
-const FEATURED_TAGS = ["#ai", "#리츠", "#데이터센터", "#플레이스메이킹", "#도쿄"];
-
-const posts = [
-  {
-    slug: "hello",
+const posts: Record<string, { title: string; date: string; body: string }> = {
+  hello: {
     title: "첫 글: 내 웹사이트 시작",
-    excerpt: "매거진처럼 읽기 좋은 미니멀 블로그를 만들고 있어요.",
     date: "2026-02-13",
-    category: "IGIS",
-    tags: ["#ai", "#리츠"],
-  },
-  {
-    slug: "project-1",
-    title: "프로젝트: 데이터 기반 인력/재무 모델링",
-    excerpt: "내가 했던 분석/모델링을 짧게 정리합니다.",
-    date: "2026-02-10",
-    category: "금융",
-    tags: ["#데이터센터"],
-  },
-];
+    body: `
+## 왜 이 스타일?
+정보 중심 + 여백 + 단순한 네비게이션이 좋아서.
 
-export default function Home() {
+## 앞으로 쓸 것
+- 프로젝트 기록
+- 읽은 것 정리
+- 짧은 인사이트
+`.trim(),
+  },
+  "project-1": {
+    title: "프로젝트: 데이터 기반 인력/재무 모델링",
+    date: "2026-02-10",
+    body: `
+## 한 줄 요약
+숫자로 설명 가능한 계획을 만들자.
+
+## 핵심
+- 지표 정의
+- 가정/시나리오
+- 결과를 “읽기 쉽게” 보여주기
+`.trim(),
+  },
+};
+
+export function generateStaticParams() {
+  return Object.keys(posts).map((slug) => ({ slug }));
+}
+
+export default function PostPage({ params }: { params: { slug: string } }) {
+  const post = posts[params.slug];
+  if (!post) return <div className="container">Not found.</div>;
+
   return (
     <main className="container">
-      <nav className="nav">
-        <div className="brand">MY BLOG</div>
-        {CATEGORIES.map((c) => (
-          <a key={c} href={`/?cat=${encodeURIComponent(c)}`}>{c}</a>
-        ))}
-      </nav>
-
-      <h1 className="h1">공간과 금융에 대한 나의 생각</h1>
-      <p className="sub">짧고 명확한 글, 읽기 좋은 여백, 깔끔한 카드 목록.</p>
-
-      <div className="pills">
-        {FEATURED_TAGS.map((t) => (
-          <span className="pill" key={t}>{t}</span>
-        ))}
-      </div>
-
-      <div className="grid">
-        {posts.map((p) => (
-          <a className="card" key={p.slug} href={`/posts/${p.slug}`}>
-            <div style={{ fontWeight: 700, letterSpacing: "-0.02em" }}>{p.title}</div>
-            <p className="sub">{p.excerpt}</p>
-            <div className="meta">
-              <span>{p.date}</span><span>·</span><span>{p.category}</span><span>·</span>
-              <span>{p.tags.join(" ")}</span>
-            </div>
-          </a>
-        ))}
-      </div>
-
+      <a href="/" className="pill">← 홈</a>
+      <h1 className="h1">{post.title}</h1>
+      <div className="meta"><span>{post.date}</span></div>
       <hr className="hr" />
-      <p className="sub">© {new Date().getFullYear()} All rights reserved.</p>
+      <article className="article">
+        {post.body.split("\n").map((line, i) => {
+          if (line.startsWith("## ")) return <h2 key={i}>{line.replace("## ", "")}</h2>;
+          if (!line.trim()) return <div key={i} style={{ height: 8 }} />;
+          return <p key={i}>{line}</p>;
+        })}
+      </article>
     </main>
   );
 }
