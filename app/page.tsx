@@ -1,4 +1,7 @@
-import React from "react";
+"use client";
+
+import { useEffect, useState } from "react";
+
 type Post = {
   slug: string;
   title: string;
@@ -30,20 +33,14 @@ const posts: Post[] = [
   },
 ];
 
-function getParam(name: string) {
-  if (typeof window === "undefined") return null;
-  const url = new URL(window.location.href);
-  return url.searchParams.get(name);
-}
-
 export default function Home() {
-  // ✅ 클라이언트에서만 읽기
-  const [cat, setCat] = React.useState<string | null>(null);
-  const [tag, setTag] = React.useState<string | null>(null);
+  const [cat, setCat] = useState<string | null>(null);
+  const [tag, setTag] = useState<string | null>(null);
 
-  React.useEffect(() => {
-    setCat(getParam("cat"));
-    setTag(getParam("tag"));
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    setCat(url.searchParams.get("cat"));
+    setTag(url.searchParams.get("tag"));
   }, []);
 
   const filtered = posts.filter((p) => {
@@ -53,7 +50,6 @@ export default function Home() {
   });
 
   const clearFilters = () => {
-    if (typeof window === "undefined") return;
     const url = new URL(window.location.href);
     url.searchParams.delete("cat");
     url.searchParams.delete("tag");
@@ -61,7 +57,6 @@ export default function Home() {
   };
 
   const setFilter = (next: { cat?: string; tag?: string }) => {
-    if (typeof window === "undefined") return;
     const url = new URL(window.location.href);
     if (next.cat !== undefined) {
       if (next.cat) url.searchParams.set("cat", next.cat);
@@ -103,8 +98,7 @@ export default function Home() {
       <p className="sub">
         {cat || tag ? (
           <>
-            필터 적용됨:{" "}
-            <b>{cat ? cat : "전체"}</b>
+            필터 적용됨: <b>{cat ? cat : "전체"}</b>
             {tag ? <> / <b>{tag}</b></> : null}
             {" · "}
             <button className="pill" onClick={clearFilters} style={{ cursor: "pointer" }}>
@@ -154,3 +148,4 @@ export default function Home() {
     </main>
   );
 }
+
