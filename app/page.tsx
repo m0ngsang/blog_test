@@ -127,8 +127,27 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="grid">
-        {(filtered.length ? filtered : posts).map((p) => (
+      <div className="grid">{filtered.length === 0 ? (
+  <div className="sub">해당 조건의 글이 아직 없어요.</div>
+) : (
+  <div className="grid">
+    {filtered.map((p) => (
+      <a className="card" key={p.slug} href={`/posts/${p.slug}`}>
+        <div style={{ fontWeight: 700, letterSpacing: "-0.02em" }}>{p.title}</div>
+        <p className="sub">{p.excerpt}</p>
+        <div className="meta">
+          <span>{p.date}</span>
+          <span>·</span>
+          <span>{p.category}</span>
+          <span>·</span>
+          <span>{p.tags.join(" ")}</span>
+        </div>
+      </a>
+    ))}
+  </div>
+)}
+
+       {filtered.map((p) => (
           <a className="card" key={p.slug} href={`/posts/${p.slug}`}>
             <div style={{ fontWeight: 700, letterSpacing: "-0.02em" }}>{p.title}</div>
             <p className="sub">{p.excerpt}</p>
